@@ -33,6 +33,12 @@
       font-size:16px; outline:none; background:#fffdfb;
     }
     .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .checkRow{
+      display:flex; align-items:center; gap:8px; margin-top:10px;
+      color:#9a6b52; font-weight:800; font-size:13px; cursor:pointer;
+      user-select:none;
+    }
+    .checkRow input{width:auto; transform:scale(1.15)}
     button{
       width:100%; margin-top:14px; border:0; border-radius:18px; padding:12px 14px;
       background:#d98b7f; color:white; font-weight:900; font-size:16px; cursor:pointer;
@@ -95,18 +101,23 @@
     <div class="panel">
       <section class="controls">
         <h2>🐾 貓咪投資運勢小系統</h2>
-        <p class="hint">可以輸入自己的出生資料，選擇記憶，產生個人流日能量。</p>
+        <p class="hint">你先抽數字，再填進來。也可以輸入自己的出生資料，產生個人流日能量。</p>
 
         <label>日期</label>
-        <input id="dateInput" value="2026/05/23 星期六" />
+        <input id="dateInput" />
 
-        <label>出生資料（個人流年用）</label>
-        <input id="birthDate" type="date" value="1977-04-19" />
+        <label>出生資料（個人流日用）</label>
+        <input id="birthDate" type="date" />
         <div class="grid3" style="margin-top:8px">
-          <input id="birthHour" type="number" min="0" max="23" value="4" placeholder="時" />
-          <input id="birthMinute" type="number" min="0" max="59" value="50" placeholder="分" />
-          <input id="birthPlace" value="台北" placeholder="出生地" />
+          <input id="birthHour" type="number" min="0" max="23" placeholder="時" />
+          <input id="birthMinute" type="number" min="0" max="59" placeholder="分" />
+          <input id="birthPlace" placeholder="出生地" />
         </div>
+
+        <label class="checkRow">
+          <input id="rememberBirth" type="checkbox" />
+          記住我的生辰資料 🐾
+        </label>
 
         <label>塔羅數字</label>
         <div class="grid3">
@@ -199,10 +210,41 @@
 const tarotDeck = ["愚者","魔術師","女祭司","皇后","皇帝","教皇","戀人","戰車","力量","隱者","命運之輪","正義","吊人","死神","節制","惡魔","高塔","星星","月亮","太陽","審判","世界","權杖王牌","權杖二","權杖三","權杖四","權杖五","權杖六","權杖七","權杖八","權杖九","權杖十","權杖侍者","權杖騎士","權杖皇后","權杖國王","聖杯王牌","聖杯二","聖杯三","聖杯四","聖杯五","聖杯六","聖杯七","聖杯八","聖杯九","聖杯十","聖杯侍者","聖杯騎士","聖杯皇后","聖杯國王","寶劍王牌","寶劍二","寶劍三","寶劍四","寶劍五","寶劍六","寶劍七","寶劍八","寶劍九","寶劍十","寶劍侍者","寶劍騎士","寶劍皇后","寶劍國王","錢幣王牌","錢幣二","錢幣三","錢幣四","錢幣五","錢幣六","錢幣七","錢幣八","錢幣九","錢幣十","錢幣侍者","錢幣騎士","錢幣皇后","錢幣國王"];
 const hexagrams = ["乾為天","坤為地","水雷屯","山水蒙","水天需","天水訟","地水師","水地比","風天小畜","天澤履","地天泰","天地否","天火同人","火天大有","地山謙","雷地豫","澤雷隨","山風蠱","地澤臨","風地觀","火雷噬嗑","山火賁","山地剝","地雷復","天雷無妄","山天大畜","山雷頤","澤風大過","坎為水","離為火","澤山咸","雷風恆","天山遯","雷天大壯","火地晉","地火明夷","風火家人","火澤睽","水山蹇","雷水解","山澤損","風雷益","澤天夬","天風姤","澤地萃","地風升","澤水困","水風井","澤火革","火風鼎","震為雷","艮為山","風山漸","雷澤歸妹","雷火豐","火山旅","巽為風","兌為澤","風水渙","水澤節","風澤中孚","雷山小過","水火既濟","火水未濟"];
 
+function todayString(){
+  const d = new Date();
+  const week = ["星期日","星期一","星期二","星期三","星期四","星期五","星期六"][d.getDay()];
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,"0")}/${String(d.getDate()).padStart(2,"0")} ${week}`;
+}
 function n(id){ return Number(document.getElementById(id).value || 1); }
 function norm(num,max){ return ((Math.abs(Math.floor(num))-1)%max)+1; }
 function cardFrom(num){ return tarotDeck[norm(num,78)-1]; }
 function hexFrom(num){ return hexagrams[norm(num,64)-1]; }
+
+function loadBirthMemory(){
+  const remember = localStorage.getItem("catRememberBirth") === "true";
+  document.getElementById("rememberBirth").checked = remember;
+  if (remember) {
+    document.getElementById("birthDate").value = localStorage.getItem("catBirthDate") || "";
+    document.getElementById("birthHour").value = localStorage.getItem("catBirthHour") || "";
+    document.getElementById("birthMinute").value = localStorage.getItem("catBirthMinute") || "";
+    document.getElementById("birthPlace").value = localStorage.getItem("catBirthPlace") || "";
+  }
+}
+function saveBirthMemory(){
+  const remember = document.getElementById("rememberBirth").checked;
+  localStorage.setItem("catRememberBirth", remember ? "true" : "false");
+  if (remember) {
+    localStorage.setItem("catBirthDate", document.getElementById("birthDate").value || "");
+    localStorage.setItem("catBirthHour", document.getElementById("birthHour").value || "");
+    localStorage.setItem("catBirthMinute", document.getElementById("birthMinute").value || "");
+    localStorage.setItem("catBirthPlace", document.getElementById("birthPlace").value || "");
+  } else {
+    localStorage.removeItem("catBirthDate");
+    localStorage.removeItem("catBirthHour");
+    localStorage.removeItem("catBirthMinute");
+    localStorage.removeItem("catBirthPlace");
+  }
+}
 
 function tarotMeaning(card){
   if(/高塔|死神|寶劍十|寶劍九|月亮|惡魔/.test(card)) return "風險偏高，情緒與消息面容易干擾判斷。";
@@ -213,11 +255,12 @@ function tarotMeaning(card){
 }
 
 function ziweiEnergy(){
-  const bd = document.getElementById("birthDate").value || "1977-04-19";
+  const bd = document.getElementById("birthDate").value || "";
   const hour = Number(document.getElementById("birthHour").value || 0);
   const minute = Number(document.getElementById("birthMinute").value || 0);
   const place = document.getElementById("birthPlace").value || "";
   const today = document.getElementById("dateInput").value || "";
+  if (!bd) return {mood:"未輸入生辰", score:"—", text:"可輸入自己的出生年月日與時間，產生個人流日能量。"};
   const digits = (bd + today + hour + minute + place.length).split("").reduce((s,ch)=>s + (Number(ch)||0),0);
   const seed = (digits + hour*2 + Math.floor(minute/10) + place.length*3) % 5;
   const types = [
@@ -244,6 +287,7 @@ function judge(cards,h1,h2){
 }
 
 function render(){
+  saveBirthMemory();
   const cards = [cardFrom(n("t1")), cardFrom(n("t2")), cardFrom(n("t3"))];
   const h1 = hexFrom(n("i1")+n("i2"));
   const h2 = hexFrom(n("i2")+n("i3"));
@@ -262,7 +306,7 @@ function render(){
   document.getElementById("tarotMeaning").textContent = tarotMeaning(cards[0]);
   document.getElementById("ziweiMood").textContent = z.mood;
   document.getElementById("ziweiText").textContent = z.text;
-  document.getElementById("ziweiScore").textContent = `個人穩定指數：${z.score}%`;
+  document.getElementById("ziweiScore").textContent = z.score === "—" ? "個人穩定指數：—" : `個人穩定指數：${z.score}%`;
 
   const list = document.getElementById("tarotList");
   list.innerHTML = "";
@@ -274,6 +318,7 @@ function render(){
   });
 }
 async function downloadPNG(){
+  saveBirthMemory();
   const card = document.getElementById("fortuneCard");
   const canvas = await html2canvas(card, {scale:2, backgroundColor:"#fff7ec"});
   const a = document.createElement("a");
@@ -281,6 +326,14 @@ async function downloadPNG(){
   a.download = "cat-investment-fortune.png";
   a.click();
 }
+document.getElementById("dateInput").value = todayString();
+loadBirthMemory();
+document.getElementById("rememberBirth").addEventListener("change", saveBirthMemory);
+["birthDate","birthHour","birthMinute","birthPlace"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", () => {
+    if (document.getElementById("rememberBirth").checked) saveBirthMemory();
+  });
+});
 render();
 </script>
 </body>
