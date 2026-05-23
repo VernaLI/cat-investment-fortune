@@ -95,10 +95,18 @@
     <div class="panel">
       <section class="controls">
         <h2>🐾 貓咪投資運勢小系統</h2>
-        <p class="hint">你先抽數字，再填進來。塔羅填 1～78；易經填三個直覺數字。</p>
+        <p class="hint">你先抽數字，再填進來。也可以輸入自己的出生資料，產生個人流日能量。</p>
 
         <label>日期</label>
         <input id="dateInput" value="2026/05/23 星期六" />
+
+        <label>出生資料（個人流日用）</label>
+        <input id="birthDate" type="date" value="1977-04-19" />
+        <div class="grid3" style="margin-top:8px">
+          <input id="birthHour" type="number" min="0" max="23" value="4" placeholder="時" />
+          <input id="birthMinute" type="number" min="0" max="59" value="50" placeholder="分" />
+          <input id="birthPlace" value="台北" placeholder="出生地" />
+        </div>
 
         <label>塔羅數字</label>
         <div class="grid3">
@@ -157,6 +165,13 @@
             </div>
             <p class="small" id="ichingText"></p>
           </div>
+
+          <div class="box ziwei">
+            <h2>🌌 紫微／個人流日</h2>
+            <div class="big" style="font-size:27px;color:#7a5bb3" id="ziweiMood"></div>
+            <p class="small" id="ziweiText"></p>
+            <p class="small" id="ziweiScore"></p>
+          </div>
         </section>
 
         <section class="bottom">
@@ -197,6 +212,24 @@ function tarotMeaning(card){
   return "市場訊號中性，重點在紀律與倉位控制。";
 }
 
+function ziweiEnergy(){
+  const bd = document.getElementById("birthDate").value || "1977-04-19";
+  const hour = Number(document.getElementById("birthHour").value || 0);
+  const minute = Number(document.getElementById("birthMinute").value || 0);
+  const place = document.getElementById("birthPlace").value || "";
+  const today = document.getElementById("dateInput").value || "";
+  const digits = (bd + today + hour + minute + place.length).split("").reduce((s,ch)=>s + (Number(ch)||0),0);
+  const seed = (digits + hour*2 + Math.floor(minute/10) + place.length*3) % 5;
+  const types = [
+    {mood:"穩定貓", score:72, text:"今天適合照表操課，按系統做會比臨場亂判斷更穩。適合覆盤、套利、等 A/S 級訊號。"},
+    {mood:"觀望貓", score:55, text:"今天個人能量偏保守，適合看盤、整理策略，不急著進場。"},
+    {mood:"敏銳貓", score:78, text:"今天判斷力較清楚，適合觀察結構轉折，但仍要等確認，不要提前猜。"},
+    {mood:"暴躁貓", score:42, text:"今天容易急、容易想追回虧損，最重要是降低交易頻率與槓桿。"},
+    {mood:"FOMO貓", score:38, text:"今天容易看到別人賺就手癢，建議先看倉位，再看機會。不要追最後一棒。"}
+  ];
+  return types[seed];
+}
+
 function judge(cards,h1,h2){
   const text = [...cards,h1,h2].join(" ");
   let score = 50;
@@ -215,6 +248,7 @@ function render(){
   const h1 = hexFrom(n("i1")+n("i2"));
   const h2 = hexFrom(n("i2")+n("i3"));
   const j = judge(cards,h1,h2);
+  const z = ziweiEnergy();
   document.getElementById("dateText").textContent = document.getElementById("dateInput").value;
   document.getElementById("moodText").textContent = j.mood;
   document.getElementById("scoreText").textContent = `多空能量指數：${j.score}%`;
@@ -226,6 +260,9 @@ function render(){
   document.getElementById("ichingText").textContent = "阻力與機會並存，先看節奏，再決定是否出手。";
   document.getElementById("summaryText").textContent = j.summary;
   document.getElementById("tarotMeaning").textContent = tarotMeaning(cards[0]);
+  document.getElementById("ziweiMood").textContent = z.mood;
+  document.getElementById("ziweiText").textContent = z.text;
+  document.getElementById("ziweiScore").textContent = `個人穩定指數：${z.score}%`;
 
   const list = document.getElementById("tarotList");
   list.innerHTML = "";
