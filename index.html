@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>貓咪投資運勢小卡</title>
+  <style>
+    :root{
+      --bg:#fff7ec; --card:#fffaf4; --line:#f4c6b5; --brown:#4a2f24;
+      --muted:#8a6a57; --pink:#fff0f0; --pink2:#c85f66; --yellow:#fff8e4;
+      --green:#eef9ed; --blue:#eef6ff; --purple:#f6f0ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+      background:linear-gradient(180deg,#fff7ec,#fff0f6); color:var(--brown);
+      padding:20px;
+    }
+    .wrap{max-width:1080px;margin:0 auto}
+    .panel{
+      background:rgba(255,255,255,.82); border:2px solid var(--line);
+      border-radius:28px; box-shadow:0 12px 28px rgba(120,70,40,.12);
+      padding:18px; display:grid; grid-template-columns:300px 1fr; gap:18px;
+    }
+    .controls{
+      background:#fff; border:1px solid #f2d4c8; border-radius:24px; padding:16px;
+      height:max-content; position:sticky; top:16px;
+    }
+    h1,h2,p{margin:0}
+    label{display:block;font-weight:800;color:#9a6b52;margin:12px 0 6px;font-size:14px}
+    input{
+      width:100%; border:1px solid #e9c8bb; border-radius:16px; padding:11px 12px;
+      font-size:16px; outline:none; background:#fffdfb;
+    }
+    .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    button{
+      width:100%; margin-top:14px; border:0; border-radius:18px; padding:12px 14px;
+      background:#d98b7f; color:white; font-weight:900; font-size:16px; cursor:pointer;
+    }
+    button.secondary{background:#9ab88f}
+    .hint{font-size:13px;color:#9a6b52;line-height:1.6;margin-top:10px}
+    #fortuneCard{
+      background:var(--card); border:4px solid var(--line); border-radius:34px;
+      padding:26px; position:relative; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);
+    }
+    .catTop{position:absolute;right:24px;top:14px;font-size:62px}
+    .paw{position:absolute;right:92px;bottom:20px;font-size:42px;opacity:.55}
+    .date{font-size:15px;color:#9a6b52;font-weight:800}
+    .title{font-size:44px;font-weight:1000;letter-spacing:4px;margin-top:4px}
+    .subtitle{color:var(--muted);margin-top:8px;font-weight:700}
+    .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+    .box{
+      border-radius:26px; padding:16px; border:1.5px solid #ead3c8; min-height:142px;
+      background:#fff;
+    }
+    .box h2{font-size:20px;font-weight:1000;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+    .mood{background:var(--pink);border-color:#f3bbb9}
+    .mood h2,.mood .big{color:var(--pink2)}
+    .advice{background:var(--yellow);border-color:#edca8e}
+    .tarot{background:#fef1f6;border-color:#efbdd4}
+    .iching{background:var(--green);border-color:#b9d8b4}
+    .ziwei{background:var(--purple);border-color:#d8c4f2}
+    .notice{background:#fff7e8;border-color:#efc48b}
+    .helper{background:var(--blue);border-color:#b9d0ed}
+    .summary{background:var(--pink);border-color:#f0b6b6}
+    .big{font-size:31px;font-weight:1000;margin:6px 0 12px}
+    .bar{height:22px;background:#fff;border:1px solid #f3bbb9;border-radius:99px;overflow:hidden}
+    .barIn{height:100%;background:linear-gradient(90deg,#9ac789,#f4cc6b,#ef8f8f);width:50%}
+    .small{font-size:14px;color:#6f574e;line-height:1.8}
+    .tarotList{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .tarotCard{background:white;border:1px solid #efbdd4;border-radius:18px;padding:10px;text-align:center}
+    .tarotCard .emoji{font-size:25px}
+    .tarotCard .name{font-weight:900;font-size:14px;margin-top:4px}
+    .hex{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .hex div{background:white;border:1px solid #b9d8b4;border-radius:18px;padding:12px;text-align:center}
+    .hex .label{font-size:12px;color:#6f8d68;font-weight:800}
+    .hex .name{font-size:20px;color:#426c3c;font-weight:1000;margin-top:4px}
+    .bottom{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+    ul{padding-left:22px;margin:0;color:#5d4639;line-height:1.9;font-weight:700}
+    .footer{
+      margin-top:16px;text-align:center;background:#fff7e8;border:1px solid #efc48b;
+      border-radius:999px;padding:10px;color:#8a6a57;font-weight:800
+    }
+    @media(max-width:860px){
+      .panel{grid-template-columns:1fr}
+      .controls{position:static}
+      .cards,.bottom{grid-template-columns:1fr}
+      .title{font-size:34px}
+      .catTop{font-size:48px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <section class="controls">
+        <h2>🐾 貓咪投資運勢小系統</h2>
+        <p class="hint">你先抽數字，再填進來。塔羅填 1～78；易經填三個直覺數字。</p>
+
+        <label>日期</label>
+        <input id="dateInput" value="2026/05/23 星期六" />
+
+        <label>塔羅數字</label>
+        <div class="grid3">
+          <input id="t1" type="number" value="7" />
+          <input id="t2" type="number" value="22" />
+          <input id="t3" type="number" value="56" />
+        </div>
+
+        <label>易經數字</label>
+        <div class="grid3">
+          <input id="i1" type="number" value="18" />
+          <input id="i2" type="number" value="43" />
+          <input id="i3" type="number" value="9" />
+        </div>
+
+        <button onclick="render()">產生今日小卡 🐱</button>
+        <button class="secondary" onclick="downloadPNG()">下載 PNG 圖卡</button>
+        <p class="hint">提醒：這是娛樂與心態檢查工具，不是買賣建議。真正下單還是看你的系統、倉位與風控。</p>
+      </section>
+
+      <main id="fortuneCard">
+        <div class="catTop">🐱</div>
+        <div class="paw">🐾</div>
+        <div class="date" id="dateText"></div>
+        <h1 class="title">今日投資運勢</h1>
+        <p class="subtitle">投資有風險，操作靠紀律，貓貓陪你穩住心態。</p>
+
+        <section class="cards">
+          <div class="box mood">
+            <h2>☁️ 今日市場氣</h2>
+            <div class="big" id="moodText"></div>
+            <div class="bar"><div class="barIn" id="barIn"></div></div>
+            <p class="small" id="scoreText"></p>
+          </div>
+
+          <div class="box advice">
+            <h2>🛡️ 今日操作建議</h2>
+            <ul>
+              <li id="adviceText"></li>
+              <li id="levText"></li>
+              <li>優先：等結構、等確認、不情緒單。</li>
+            </ul>
+          </div>
+
+          <div class="box tarot">
+            <h2>🃏 塔羅指引</h2>
+            <div class="tarotList" id="tarotList"></div>
+            <p class="small" id="tarotMeaning"></p>
+          </div>
+
+          <div class="box iching">
+            <h2>☯️ 易經卦象</h2>
+            <div class="hex">
+              <div><p class="label">本卦</p><p class="name" id="h1"></p></div>
+              <div><p class="label">變卦</p><p class="name" id="h2"></p></div>
+            </div>
+            <p class="small" id="ichingText"></p>
+          </div>
+        </section>
+
+        <section class="bottom">
+          <div class="box notice">
+            <h2>⚠️ 注意事項</h2>
+            <p class="small">不追高、不抄底、不加碼報復。大跌日先活下來，機會會再出現。</p>
+          </div>
+          <div class="box helper">
+            <h2>🍀 今日小幫手</h2>
+            <p class="small">幸運操作：覆盤、整理、等待下一筆 A/S 級訊號。</p>
+          </div>
+          <div class="box summary">
+            <h2>💗 一句話總結</h2>
+            <p class="big" style="font-size:22px;color:#5d3c38" id="summaryText"></p>
+          </div>
+        </section>
+
+        <div class="footer">💡 大跌不可怕，可怕的是失去紀律。穩住自己，市場自然會給機會。</div>
+      </main>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script>
+const tarotDeck = ["愚者","魔術師","女祭司","皇后","皇帝","教皇","戀人","戰車","力量","隱者","命運之輪","正義","吊人","死神","節制","惡魔","高塔","星星","月亮","太陽","審判","世界","權杖王牌","權杖二","權杖三","權杖四","權杖五","權杖六","權杖七","權杖八","權杖九","權杖十","權杖侍者","權杖騎士","權杖皇后","權杖國王","聖杯王牌","聖杯二","聖杯三","聖杯四","聖杯五","聖杯六","聖杯七","聖杯八","聖杯九","聖杯十","聖杯侍者","聖杯騎士","聖杯皇后","聖杯國王","寶劍王牌","寶劍二","寶劍三","寶劍四","寶劍五","寶劍六","寶劍七","寶劍八","寶劍九","寶劍十","寶劍侍者","寶劍騎士","寶劍皇后","寶劍國王","錢幣王牌","錢幣二","錢幣三","錢幣四","錢幣五","錢幣六","錢幣七","錢幣八","錢幣九","錢幣十","錢幣侍者","錢幣騎士","錢幣皇后","錢幣國王"];
+const hexagrams = ["乾為天","坤為地","水雷屯","山水蒙","水天需","天水訟","地水師","水地比","風天小畜","天澤履","地天泰","天地否","天火同人","火天大有","地山謙","雷地豫","澤雷隨","山風蠱","地澤臨","風地觀","火雷噬嗑","山火賁","山地剝","地雷復","天雷無妄","山天大畜","山雷頤","澤風大過","坎為水","離為火","澤山咸","雷風恆","天山遯","雷天大壯","火地晉","地火明夷","風火家人","火澤睽","水山蹇","雷水解","山澤損","風雷益","澤天夬","天風姤","澤地萃","地風升","澤水困","水風井","澤火革","火風鼎","震為雷","艮為山","風山漸","雷澤歸妹","雷火豐","火山旅","巽為風","兌為澤","風水渙","水澤節","風澤中孚","雷山小過","水火既濟","火水未濟"];
+
+function n(id){ return Number(document.getElementById(id).value || 1); }
+function norm(num,max){ return ((Math.abs(Math.floor(num))-1)%max)+1; }
+function cardFrom(num){ return tarotDeck[norm(num,78)-1]; }
+function hexFrom(num){ return hexagrams[norm(num,64)-1]; }
+
+function tarotMeaning(card){
+  if(/高塔|死神|寶劍十|寶劍九|月亮|惡魔/.test(card)) return "風險偏高，情緒與消息面容易干擾判斷。";
+  if(/太陽|星星|世界|錢幣九|錢幣十|權杖六/.test(card)) return "氣勢較順，容易有亮點，但仍要等確認。";
+  if(/節制|隱者|寶劍四|錢幣四/.test(card)) return "適合保守、觀望、整理策略，不宜躁進。";
+  if(/權杖騎士|戰車|權杖八|命運之輪/.test(card)) return "波動加快，機會出現很快，也容易追高被洗。";
+  return "市場訊號中性，重點在紀律與倉位控制。";
+}
+
+function judge(cards,h1,h2){
+  const text = [...cards,h1,h2].join(" ");
+  let score = 50;
+  if(/太陽|星星|世界|權杖六|雷天大壯|火天大有|地天泰/.test(text)) score += 18;
+  if(/高塔|死神|寶劍十|月亮|天地否|山地剝|水山蹇|澤水困/.test(text)) score -= 22;
+  if(/節制|隱者|寶劍四|艮為山|水山蹇/.test(text)) score -= 8;
+  if(/命運之輪|權杖騎士|權杖八|雷火豐|火山旅/.test(text)) score += 5;
+  score = Math.max(10, Math.min(90, score));
+  if(score >= 62) return {mood:"偏多但要等確認", score, advice:"可小倉試單，避免追高。", lev:"槓桿建議：小槓桿（≤3倍）", summary:"市場有機會，但不適合貪心。"};
+  if(score <= 38) return {mood:"偏空／偏防守", score, advice:"不抄底、不追空，先保護本金。", lev:"槓桿建議：低槓桿或空手", summary:"先活下來，比猜底更重要。"};
+  return {mood:"震盪觀望", score, advice:"等待明確訊號，少做比亂做更好。", lev:"槓桿建議：小倉觀察", summary:"慢一點的人，會比急的人穩。"};
+}
+
+function render(){
+  const cards = [cardFrom(n("t1")), cardFrom(n("t2")), cardFrom(n("t3"))];
+  const h1 = hexFrom(n("i1")+n("i2"));
+  const h2 = hexFrom(n("i2")+n("i3"));
+  const j = judge(cards,h1,h2);
+  document.getElementById("dateText").textContent = document.getElementById("dateInput").value;
+  document.getElementById("moodText").textContent = j.mood;
+  document.getElementById("scoreText").textContent = `多空能量指數：${j.score}%`;
+  document.getElementById("barIn").style.width = j.score + "%";
+  document.getElementById("adviceText").textContent = j.advice;
+  document.getElementById("levText").textContent = j.lev;
+  document.getElementById("h1").textContent = h1;
+  document.getElementById("h2").textContent = h2;
+  document.getElementById("ichingText").textContent = "阻力與機會並存，先看節奏，再決定是否出手。";
+  document.getElementById("summaryText").textContent = j.summary;
+  document.getElementById("tarotMeaning").textContent = tarotMeaning(cards[0]);
+
+  const list = document.getElementById("tarotList");
+  list.innerHTML = "";
+  cards.forEach(c=>{
+    const div = document.createElement("div");
+    div.className = "tarotCard";
+    div.innerHTML = `<div class="emoji">🐈</div><div class="name">${c}</div>`;
+    list.appendChild(div);
+  });
+}
+async function downloadPNG(){
+  const card = document.getElementById("fortuneCard");
+  const canvas = await html2canvas(card, {scale:2, backgroundColor:"#fff7ec"});
+  const a = document.createElement("a");
+  a.href = canvas.toDataURL("image/png");
+  a.download = "cat-investment-fortune.png";
+  a.click();
+}
+render();
+</script>
+</body>
+</html>
