@@ -101,7 +101,7 @@
     <div class="panel">
       <section class="controls">
         <h2>🐾 貓咪投資運勢小系統</h2>
-        <p class="hint">可以輸入自己的出生資料，選擇記憶就不用再重填，可以看個人流年能量。</p>
+        <p class="hint">可以輸入自己的出生資料，看自己的個人流年能量。</p>
 
         <label>日期</label>
         <input id="dateInput" />
@@ -178,7 +178,7 @@
           </div>
 
           <div class="box ziwei">
-            <h2>🌌 紫微／個人流日</h2>
+            <h2>🌌 紫微／個人流年</h2>
             <div class="big" style="font-size:27px;color:#7a5bb3" id="ziweiMood"></div>
             <p class="small" id="ziweiText"></p>
             <p class="small" id="ziweiScore"></p>
@@ -192,7 +192,7 @@
           </div>
           <div class="box helper">
             <h2>🍀 今日小幫手</h2>
-            <p class="small">幸運操作：覆盤、整理、等待下一筆 A/S 級訊號。</p>
+            <p class="small" id="helperText"></p>
           </div>
           <div class="box summary">
             <h2>💗 一句話總結</h2>
@@ -260,7 +260,7 @@ function ziweiEnergy(){
   const minute = Number(document.getElementById("birthMinute").value || 0);
   const place = document.getElementById("birthPlace").value || "";
   const today = document.getElementById("dateInput").value || "";
-  if (!bd) return {mood:"未輸入生辰", score:"—", text:"可輸入自己的出生年月日與時間，產生個人流日能量。"};
+  if (!bd) return {mood:"未輸入生辰", score:"—", text:"可輸入自己的出生年月日與時間，產生個人流年能量。"};
   const digits = (bd + today + hour + minute + place.length).split("").reduce((s,ch)=>s + (Number(ch)||0),0);
   const seed = (digits + hour*2 + Math.floor(minute/10) + place.length*3) % 5;
   const types = [
@@ -268,7 +268,7 @@ function ziweiEnergy(){
     {mood:"觀望貓", score:55, text:"今天個人能量偏保守，適合看盤、整理策略，不急著進場。"},
     {mood:"敏銳貓", score:78, text:"今天判斷力較清楚，適合觀察結構轉折，但仍要等確認，不要提前猜。"},
     {mood:"暴躁貓", score:42, text:"今天容易急、容易想追回虧損，最重要是降低交易頻率與槓桿。"},
-    {mood:"FOMO貓", score:38, text:"今天容易看到別人賺就手癢，建議先看倉位，再看機會。不要追最後一棒。"}
+    {mood:"失控貓", score:38, text:"今天容易手癢亂開單，手綁不起來就打斷。"}
   ];
   return types[seed];
 }
@@ -281,8 +281,8 @@ function judge(cards,h1,h2){
   if(/節制|隱者|寶劍四|艮為山|水山蹇/.test(text)) score -= 8;
   if(/命運之輪|權杖騎士|權杖八|雷火豐|火山旅/.test(text)) score += 5;
   score = Math.max(10, Math.min(90, score));
-  if(score >= 62) return {mood:"偏多但要等確認", score, advice:"可小倉試單，避免追高。", lev:"槓桿建議：小槓桿（≤3倍）", summary:"市場有機會，但不適合貪心。"};
-  if(score <= 38) return {mood:"偏空／偏防守", score, advice:"不抄底、不追空，先保護本金。", lev:"槓桿建議：低槓桿或空手", summary:"先活下來，比猜底更重要。"};
+  if(score >= 62) return {mood:"偏多但要等確認", score, advice:"空倉不追多，手上有倉策略性止盈。", lev:"槓桿建議：小槓桿（≤3倍）", summary:"市場有機會，但不適合貪心。"};
+  if(score <= 38) return {mood:"偏空／偏防守", score, advice:"不亂割肉、不亂抄底、符合自己的策略才能動作。", lev:"槓桿建議：低槓桿或空手", summary:"先活下來，比猜底更重要。"};
   return {mood:"震盪觀望", score, advice:"等待明確訊號，少做比亂做更好。", lev:"槓桿建議：小倉觀察", summary:"慢一點的人，會比急的人穩。"};
 }
 
@@ -303,6 +303,23 @@ function render(){
   document.getElementById("h2").textContent = h2;
   document.getElementById("ichingText").textContent = "阻力與機會並存，先看節奏，再決定是否出手。";
   document.getElementById("summaryText").textContent = j.summary;
+
+  let helper = "覆盤、整理、等待下一筆 A/S 級訊號。";
+
+  if (j.score <= 38) {
+    helper = "空手、覆盤、降低槓桿。";
+  }
+
+  if (j.score >= 62) {
+    helper = "部份止盈，等機會再進場。";
+  }
+
+  if (z.mood === "失控貓") {
+    helper = "關掉APP。";
+  }
+
+  document.getElementById("helperText").textContent =
+    "幸運操作：" + helper;
   document.getElementById("tarotMeaning").textContent = tarotMeaning(cards[0]);
   document.getElementById("ziweiMood").textContent = z.mood;
   document.getElementById("ziweiText").textContent = z.text;
